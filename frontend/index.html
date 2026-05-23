@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="styles.css" rel="stylesheet">
+</head>
+<body>
+<h1>Redis Test Website</h1>
+<h3>Create User</h3>
+<form id="create-user" method="post">
+    <div class="form-list">
+        <input name="username" placeholder="username">
+        <button type="submit">New User</button>
+    </div>
+</form>
+<h3>Create Movie</h3>
+<form id="create-movie" method="post">
+    <div class="form-list">
+        <input name="title" placeholder="title">
+        <input name="genre" placeholder="genre">
+        <input name="release_year" placeholder="release_year">
+        <input name="director" placeholder="director">
+        <button type="submit">New Movie</button>
+    </div>
+</form>
+<h3>Create Review</h3>
+<form id="create-review" method="post">
+    <div class="form-list">
+        <input name="movie_id" placeholder="movie_id">
+        <input name="user_id" placeholder="user_id">
+        <input name="rating" placeholder="rating">
+        <input name="body" placeholder="body">
+        <button type="submit">New Review</button>
+    </div>
+</form>
+</body>
+<script src="./form.js"></script>
+</html>
