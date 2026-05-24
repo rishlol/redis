@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import Redis from "ioredis";
+import cors from "cors";
 import { Database } from "bun:sqlite";
 
 /* Constants */
@@ -33,6 +34,7 @@ const db = new Database("movie_ratings.db");
 
 /* Middleware */
 app.use(express.json());
+app.use(cors());
 
 /* Routes */
 app.get("/", (req, res) => {
@@ -76,14 +78,19 @@ app.post("/reviews", (req, res) => {
     if(!movie_id || !user_id || !rating)
         res.status(401).send("movie_id, user_id, rating required.");
 
-    const result = db.prepare(`INSERT INTO reviews
-        (movie_id, user_id, rating, body, created_at)
-        VALUES (?, ?, ?, ?, ?);`
-    ).run(movie_id, user_id, rating, body ?? "", new Date().toISOString());
+    try {
+        const result = db.prepare(`INSERT INTO reviews
+            (movie_id, user_id, rating, body, created_at)
+            VALUES (?, ?, ?, ?, ?);`
+        ).run(movie_id, user_id, rating, body ?? "", new Date().toISOString());
 
-    if(result.changes == 0)
-        res.status(401).send("error inserting review");
-    res.status(200).end();
+        if(result.changes == 0)
+            res.status(409).send("error inserting review");
+        res.status(200).end();
+    } catch(e) {
+        console.log(e);
+        res.status(409).end();
+    }
 });
 
 app.post("/movies", (req, res) => {
@@ -91,14 +98,19 @@ app.post("/movies", (req, res) => {
     if(!title || !genre || !release_year)
         res.status(401).send("title, genre, release_year required.");
 
-    const result = db.prepare(`INSERT INTO movies
-        (title, genre, release_year, director)
-        VALUES (?, ?, ?, ?);`
-    ).run(title, genre, release_year, director ?? "");
-
-    if(result.changes == 0)
-        res.status(401).send("error inserting movie");
-    res.status(200).end();
+    try {
+        const result = db.prepare(`INSERT INTO movies
+            (title, genre, release_year, director)
+            VALUES (?, ?, ?, ?);`
+        ).run(title, genre, release_year, director ?? "");
+        
+        if(result.changes == 0)
+            res.status(409).send("error inserting movie");
+        res.status(200).end();
+    } catch(e) {
+        console.log(e);
+        res.status(409).send("error inserting movie!");
+    }
 });
 
 app.post("/users", (req, res) => {
@@ -106,15 +118,19 @@ app.post("/users", (req, res) => {
     if(!username)
         res.status(401).send("username required.");
 
-    const result = db.prepare(`INSERT INTO users
-        (username, created_at)
-        VALUES (?, ?);`
-    ).run(username, new Date().toISOString());
+    try {
+        const result = db.prepare(`INSERT INTO users
+            (username, created_at)
+            VALUES (?, ?);`
+        ).run(username, new Date().toISOString());
 
-    if(result.changes == 0)
-        res.status(401).send("error inserting user");
+        if(result.changes == 0)
+        res.status(409).send("error inserting user");
     res.status(200).end();
-
+    } catch(e) {
+        console.log(e);
+        res.status(409).send("error inserting user! try another username");
+    }
 });
 
 /* Prepare database */

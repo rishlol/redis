@@ -44,23 +44,28 @@
     </div>
 </form>
 </body>
-<script src="form.ts"></script>
-<script type="module" defer>
+<script src="form.js"></script>
+<script>
     document.getElementById("create-user").addEventListener("submit", async e => {
         e.preventDefault();
-        const data = Array.from(e.target.elements).map((v, _) => v.value).filter((_, i) => i < 1);
-        fetch()
-        console.log(data);
+        const data = Object.fromEntries(new FormData(e.target));
+        const res = await post("users", data);
+        if(res.status === 409)
+            alert(await res.text());
     });
     document.getElementById("create-movie").addEventListener("submit", async e => {
         e.preventDefault();
-        const data = Array.from(e.target.elements).map((v, _) => v.value).filter((_, i) => i < 4);
-        console.log(data);
+        const data = Object.fromEntries(new FormData(e.target));
+        const res = await post("movies", data);
+        if(res.status === 409)
+            alert(await res.text());
     });
     document.getElementById("create-review").addEventListener("submit", async e => {
         e.preventDefault();
-        const data = Array.from(e.target.elements).map((v, _) => v.value).filter((_, i) => i < 4);
-        console.log(data);
+        const data = Object.fromEntries(new FormData(e.target));
+        const res = await post("reviews", data);
+        if(res.status === 409)
+            alert(await res.text());
     });
 </script>
 </html>
