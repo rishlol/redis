@@ -1,37 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link href="styles.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>redis test frontend</title>
+    <link href="styles.css" rel="stylesheet">
 </head>
 <body>
 <h1>Redis Test Website</h1>
 <h3>Create User</h3>
 <form id="create-user" method="post">
     <div class="form-list">
-        <input name="username" placeholder="username">
+        <label for="username">Username</label>
+        <input name="username" id="username" required>
         <button type="submit">New User</button>
     </div>
 </form>
 <h3>Create Movie</h3>
 <form id="create-movie" method="post">
     <div class="form-list">
-        <input name="title" placeholder="title">
-        <input name="genre" placeholder="genre">
-        <input name="release_year" placeholder="release_year">
-        <input name="director" placeholder="director">
+        <label for="title">Title</label>
+        <input name="title" id="title" required>
+        <label for="genre">Genre</label>
+        <input name="genre" id="genre" required>
+        <label for="release_year">Release Year</label>
+        <input name="release_year" id="release_year" required>
+        <label for="director">Director</label>
+        <input name="director" id="director">
         <button type="submit">New Movie</button>
     </div>
 </form>
 <h3>Create Review</h3>
 <form id="create-review" method="post">
     <div class="form-list">
-        <input name="movie_id" placeholder="movie_id">
-        <input name="user_id" placeholder="user_id">
-        <input name="rating" placeholder="rating">
-        <input name="body" placeholder="body">
+        <label for="movie_id">Movie ID</label>
+        <input name="movie_id" id="movie_id" required>
+        <label for="user_id">User ID</label>
+        <input name="user_id" id="user_id" required>
+        <label for="rating">Rating</label>
+        <input name="rating" id="rating" required>
+        <label for="body">Review</label>
+        <input name="body" id="body" draggable="true">
         <button type="submit">New Review</button>
     </div>
 </form>
 </body>
-<script src="./form.js"></script>
+<script src="form.ts"></script>
+<script type="module" defer>
+    document.getElementById("create-user").addEventListener("submit", async e => {
+        e.preventDefault();
+        const data = Array.from(e.target.elements).map((v, _) => v.value).filter((_, i) => i < 1);
+        fetch()
+        console.log(data);
+    });
+    document.getElementById("create-movie").addEventListener("submit", async e => {
+        e.preventDefault();
+        const data = Array.from(e.target.elements).map((v, _) => v.value).filter((_, i) => i < 4);
+        console.log(data);
+    });
+    document.getElementById("create-review").addEventListener("submit", async e => {
+        e.preventDefault();
+        const data = Array.from(e.target.elements).map((v, _) => v.value).filter((_, i) => i < 4);
+        console.log(data);
+    });
+</script>
 </html>

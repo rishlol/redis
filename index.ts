@@ -123,4 +123,4 @@ db.prepare(users_sql).run();
 db.prepare(reviews_sql).run();
 
 /* Listen for requests */
-app.listen(3000);
+app.listen(3000, () => console.log("redis test backend running on port 3000"));
