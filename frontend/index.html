@@ -7,42 +7,48 @@
 </head>
 <body>
 <h1>Redis Test Website</h1>
-<h3>Create User</h3>
-<form id="create-user" method="post">
-    <div class="form-list">
-        <label for="username">Username</label>
-        <input name="username" id="username" required>
-        <button type="submit">New User</button>
-    </div>
-</form>
-<h3>Create Movie</h3>
-<form id="create-movie" method="post">
-    <div class="form-list">
-        <label for="title">Title</label>
-        <input name="title" id="title" required>
-        <label for="genre">Genre</label>
-        <input name="genre" id="genre" required>
-        <label for="release_year">Release Year</label>
-        <input name="release_year" id="release_year" required>
-        <label for="director">Director</label>
-        <input name="director" id="director">
-        <button type="submit">New Movie</button>
-    </div>
-</form>
-<h3>Create Review</h3>
-<form id="create-review" method="post">
-    <div class="form-list">
-        <label for="movie_id">Movie ID</label>
-        <input name="movie_id" id="movie_id" required>
-        <label for="user_id">User ID</label>
-        <input name="user_id" id="user_id" required>
-        <label for="rating">Rating</label>
-        <input name="rating" id="rating" required>
-        <label for="body">Review</label>
-        <input name="body" id="body" draggable="true">
-        <button type="submit">New Review</button>
-    </div>
-</form>
+<div class="block">
+    <h3>Create User</h3>
+    <form id="create-user" method="post">
+        <div class="form-list">
+            <label for="username">Username</label>
+            <input name="username" id="username" required>
+            <button type="submit">New User</button>
+        </div>
+    </form>
+</div>
+<div class="block">
+    <h3>Create Movie</h3>
+    <form id="create-movie" method="post">
+        <div class="form-list">
+            <label for="title">Title</label>
+            <input name="title" id="title" required>
+            <label for="genre">Genre</label>
+            <input name="genre" id="genre" required>
+            <label for="release_year">Release Year</label>
+            <input name="release_year" id="release_year" required>
+            <label for="director">Director</label>
+            <input name="director" id="director">
+            <button type="submit">New Movie</button>
+        </div>
+    </form>
+</div>
+<div class="block">
+    <h3>Create Review</h3>
+    <form id="create-review" method="post">
+        <div class="form-list">
+            <label for="movie_id">Movie ID</label>
+            <input name="movie_id" id="movie_id" required>
+            <label for="user_id">User ID</label>
+            <input name="user_id" id="user_id" required>
+            <label for="rating">Rating</label>
+            <input name="rating" id="rating" required>
+            <label for="body">Review</label>
+            <input name="body" id="body" draggable="true">
+            <button type="submit">New Review</button>
+        </div>
+    </form>
+</div>
 </body>
 <script src="form.js"></script>
 <script>

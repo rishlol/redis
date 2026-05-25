@@ -2,35 +2,15 @@ import express from "express";
 import dotenv from "dotenv";
 import Redis from "ioredis";
 import cors from "cors";
-import { Database } from "bun:sqlite";
+import db from "./db";
 
 /* Constants */
-const movies_sql = `CREATE TABLE IF NOT EXISTS movies (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-title TEXT,
-genre TEXT,
-release_year TEXT,
-director TEXT
-);`;
-const users_sql = `CREATE TABLE IF NOT EXISTS users (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-username TEXT UNIQUE,
-created_at TEXT
-);`;
-const reviews_sql = `CREATE TABLE IF NOT EXISTS reviews (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-movie_id INT,
-user_id INT,
-rating INT CHECK (rating BETWEEN 1 AND 5),
-body TEXT,
-created_at TEXT
-);`;
+const REDIS_TIMEOUT = 60;
 
 /* Initial config */
 dotenv.config();
 const app = express();
 const redis = new Redis();
-const db = new Database("movie_ratings.db");
 
 /* Middleware */
 app.use(express.json());
@@ -41,36 +21,66 @@ app.get("/", (req, res) => {
     res.status(200).send("site running");
 });
 
-app.get("/movies", (req, res) => {
-    const movies = db.query("SELECT title, genre, release_year, director FROM movies;").all();
-    res.status(200).json({ "movies":  movies });
+app.get("/movies", async (req, res) => {
+    const redis_key = "movies";
+    const movies_str = await redis.get(redis_key);
+    if(movies_str) {
+        res.status(200).json({ "movies":  JSON.parse(movies_str) });
+    } else {
+        const movies = db.query("SELECT title, genre, release_year, director FROM movies;").all();
+        redis.setex(redis_key, REDIS_TIMEOUT, JSON.stringify(movies));
+        res.status(200).json({ "movies":  movies });
+    }
 });
 
-app.get("/movies/:id", (req, res) => {
+app.get("/movies/:id", async (req, res) => {
     const { id } = req.params;
-    const movie = db.query(
-        "SELECT title, genre, release_year, director FROM movies WHERE id = ?;"
-    ).get(id) as { title: string, genre: string, release_year: string, director: string };
-    
-    res.status(200).json(movie);
+    const redis_key = `movies:${id}`;
+    const movies_id_str = await redis.get(redis_key);
+
+    if(movies_id_str) {
+        res.status(200).json(JSON.parse(movies_id_str));
+    } else {
+        const movie = db.query(
+            "SELECT title, genre, release_year, director FROM movies WHERE id = ?;"
+        ).get(id) as { title: string, genre: string, release_year: string, director: string };
+
+        redis.setex(redis_key, REDIS_TIMEOUT, JSON.stringify(movie));
+        res.status(200).json(movie);
+    }
 });
 
-app.get("/movies/genre/:genre", (req, res) => {
+app.get("/movies/genre/:genre", async (req, res) => {
     const { genre } = req.params;
-    const movies = db.query("SELECT title, genre, release_year, director FROM movies WHERE genre = ?;").all(genre);
-    res.status(200).json({ "movies": movies });
+    const redis_key = `movies:genre:${genre}`;
+    const movies_genre_genre = await redis.get(redis_key);
+    
+    if(movies_genre_genre) {
+        res.status(200).json({ "movies": JSON.parse(movies_genre_genre) });
+    } else {
+        const movies = db.query("SELECT title, genre, release_year, director FROM movies WHERE genre = ?;").all(genre);
+        redis.setex(redis_key, REDIS_TIMEOUT, JSON.stringify(movies));
+        res.status(200).json({ "movies": movies });
+    }
 });
 
-app.get("/users/:username/reviews", (req, res) => {
+app.get("/users/:username/reviews", async (req, res) => {
     const user_reviews_sql = `SELECT reviews.id, reviews.movie_id, users.id, users.username, reviews.rating, reviews.body, reviews.created_at
-    FROM users LEFT JOIN reviews
+    FROM reviews LEFT JOIN users
     ON users.id = reviews.user_id
     WHERE users.username = ?;`;
 
     const { username } = req.params;
-    const reviews = db.query(user_reviews_sql).all(username);
+    const redis_key = `users:${username}:review`;
+    const users_username_reviews = await redis.get(redis_key);
 
-    res.status(200).json({ "username": username, "reviews": reviews });
+    if(users_username_reviews) {
+        res.status(200).json({ "username": username, "reviews": JSON.parse(users_username_reviews) })
+    } else {
+        const reviews = db.query(user_reviews_sql).all(username);
+        redis.setex(redis_key, REDIS_TIMEOUT, JSON.stringify(reviews));
+        res.status(200).json({ "username": username, "reviews": reviews });
+    }
 });
 
 app.post("/reviews", (req, res) => {
@@ -132,11 +142,6 @@ app.post("/users", (req, res) => {
         res.status(409).send("error inserting user! try another username");
     }
 });
-
-/* Prepare database */
-db.prepare(movies_sql).run();
-db.prepare(users_sql).run();
-db.prepare(reviews_sql).run();
 
 /* Listen for requests */
 app.listen(3000, () => console.log("redis test backend running on port 3000"));
