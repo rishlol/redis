@@ -83,6 +83,38 @@ app.get("/users/:username/reviews", async (req, res) => {
     }
 });
 
+app.get("/users", async (req, res) => {
+    const users_sql = "SELECT * FROM users;";
+    const redis_key = "users";
+    const users = await redis.get(redis_key);
+
+    if(users) {
+        res.status(200).json({ "users": JSON.parse(users) });
+    } else {
+        const usersdb = db.query(users_sql).all();
+        redis.setex(redis_key, REDIS_TIMEOUT, JSON.stringify(usersdb));
+        res.status(200).json({ "users": usersdb });
+    }
+});
+
+app.get("/reviews", async (req, res) => {
+    const reviews_sql = `SELECT users.username, movies.title, reviews.rating, reviews.body, reviews.created_at
+    FROM reviews LEFT JOIN users
+    ON reviews.user_id = users.id
+    LEFT JOIN movies
+    ON reviews.movie_id = movies.id;`;
+    const redis_key = "reviews";
+    const reviews = await redis.get(redis_key);
+
+    if(reviews) {
+        res.status(200).json({ "reviews": JSON.parse(reviews) });
+    } else {
+        const reviewsdb = db.query(reviews_sql).all();
+        redis.setex(redis_key, REDIS_TIMEOUT, JSON.stringify(reviewsdb));
+        res.status(200).json({ "reviews": reviewsdb });
+    }
+})
+
 app.post("/reviews", (req, res) => {
     const { movie_id, user_id, rating, body } = req.body;
     if(!movie_id || !user_id || !rating)
@@ -144,4 +176,9 @@ app.post("/users", (req, res) => {
 });
 
 /* Listen for requests */
-app.listen(3000, () => console.log("redis test backend running on port 3000"));
+app.listen(3000, err => {
+    if(err)
+        console.log(err);
+    else
+        console.log("redis test backend running on port 3000");
+});

@@ -10,4 +10,13 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(dir, "index.html"));
 });
 
-app.listen(5000, () => console.log("redis test frontend running on port 5000"));
+app.get("/reviews", (req, res) => {
+    res.sendFile(path.join(dir, "reviews.html"));
+});
+
+app.listen(3001, err => {
+    if(err)
+        console.log(err);
+    else
+        console.log("redis test frontend running on port 3001");
+});

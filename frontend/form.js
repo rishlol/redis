@@ -9,4 +9,9 @@ const post = async (endpoint, data) => {
     return res;
 }
 
+const get = async (endpoint) => {
+    const res = await fetch(`${API}/${endpoint}`);
+    return res;
+}
+
 const nonEmptyString = str => str === "" ? null : str

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>redis test frontend reviews</title>
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+<h1>Redis Test Reviews</h1>
+<table id="reviews-table">
+    <tr>
+        <th>USER</th>
+        <th>MOVIE</th>
+        <th>RATING</th>
+        <th>BODY</th>
+        <th>TIMESTAMP</th>
+    </tr>
+
+</table>
+</body>
+<script src="form.js"></script>
+<script>
+    async function getReviews() {
+        const reviews = document.getElementById("reviews-table");
+        const res = await get("reviews");
+        const data = await res.json();
+
+        console.log(data);
+        if(!data.reviews) {
+            alert("cannot fetch reviews");
+        } else {
+            data.reviews.forEach((v) => {
+                const new_row = reviews.rows[0].cloneNode(true);
+                new_row.cells[0].textContent = v.username;
+                new_row.cells[1].textContent = v.title;
+                new_row.cells[2].textContent = v.rating;
+                new_row.cells[3].textContent = v.body;
+                new_row.cells[4].textContent = v.created_at;
+                reviews.appendChild(new_row);
+            });
+        }
+    }
+
+    getReviews();
+</script>
+</html>
