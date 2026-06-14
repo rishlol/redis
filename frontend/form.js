@@ -1,4 +1,4 @@
-const API = "http://localhost:3000";
+const API = "http://redistest-frontend:3000";
 
 const post = async (endpoint, data) => {
     const res = await fetch(`${API}/${endpoint}`, {

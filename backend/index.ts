@@ -9,8 +9,9 @@ const REDIS_TIMEOUT = 60;
 
 /* Initial config */
 dotenv.config();
+const REDIS_NAME = process.env.REDIS_NAME ?? "localhost"
 const app = express();
-const redis = new Redis();
+const redis = new Redis(REDIS_NAME);
 
 /* Middleware */
 app.use(express.json());
